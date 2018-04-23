@@ -1,0 +1,141 @@
+Graham lecture:
+react gives you consistency : good for reading other people code / debug
+good for something with lot of dom updates, not good at small lightweight
+react is a library written in/for js
+
+npm install --save react react-dom  || yarn add react react-dom //both commands work
+
+ReactDOM.render() //takes 2 arguments, 1) a component, 2) a place to place the component
+example:
+  ReactDOM.render(
+    React.createElement("h2",{},"hello")  //element,props,children (single child here)
+    React.createElement("div",{},[        //element,props,children (multi child here)
+      React.createElement("h2",{},"hello")
+      React.createElement("p",{},"Nice to meet you!")
+    ])
+    document.getElementById("main")
+  )
+
+Symbols: js doesnt have them but react does
+
+import React from 'react';    //React:variable react:packagename
+import ReactDOM from 'react'; //ReactDOM:variable react:packagename
+
+webpack always calls babel.
+dev calls webpack, so server calls webpack, not the file or user end rbowser
+//////////
+PROPS
+Props allow us to pass values into our components.
+To pass props to a component, you add them as attributes when you render them:
+<MyComponent propName={propValue} />
+<MyComponent propName="propValue" /> //this is hardcoded
+
+//component with prop
+const madMaxGenres = ['Action', 'Adventure', 'Science Fiction', 'Thriller'];
+ReactDOM.render(
+  <MovieCard
+    title="Mad Max: Fury Road"
+    poster="http://image.tmdb.org/t/p/w342/kqjL17yufvn9OVLyXYpvtyrFfak.jpg"
+    genres={madMaxGenres}
+  />,
+  document.getElementById('root')
+);
+//Accessing props
+class MovieCard extends React.Component {
+  render() {
+    return (
+      <div className="movie-card">
+        <img
+          src={this.props.poster}
+          alt={this.props.title}
+        />
+        <h2>{this.props.title}</h2>
+        <small>Genres: {this.props.genres.join(', ')}</small>
+      </div>
+    );
+  }
+}
+
+//Default values for props
+  //whenever we omit the poster prop, or if it's undefined, the MovieCard component
+  //will use this default prop instead
+  MovieCard.defaultProps = {    poster: 'http://i.imgur.com/bJw8ndW.png'  };
+  const jurassicWorldGenres = ['Action', 'Adventure', 'Science Fiction', 'Thriller'];
+  ReactDOM.render(
+    <MovieCard
+      title="Jurassic World"
+      genres={jurassicWorldGenres}
+    />,
+    document.getElementById('root')
+  );
+///////props example with defaults
+src/components/Spaceship.js
+  import React from 'react';
+  class Spaceship extends React.Component {
+    render() {
+      const { name, speed, hasRockets, colors } = this.props;
+      return (
+        <div>
+          <h1>Spaceship Name: {name}</h1>
+          <p>Ship Info:</p>
+          <p>Speed: {speed}</p>
+          <p>Rockets: {hasRockets ? "Yes" : "No"}</p>
+          <ul>
+            {colors.map((color, index) => <li key={index}>{color}</li>)}
+          </ul>
+        </div>
+      )
+    }
+  }
+  Spaceship.defaultProps = {
+    speed: 'slow',
+    hasRockets: false,
+    colors: ['black', 'red']
+  }
+  export default Spaceship;
+src/index.js
+  import React from 'react';
+  import ReactDOM from 'react-dom';
+  import Spaceship from './components/Spaceship';
+  ReactDOM.render(
+    <Spaceship name="Millennium Falcon" />,
+    document.getElementById('root')
+  );
+/////////////////////PropTypes
+PropTypes is a way for us to enforce that components receive the right props in the right form
+  These warnings only show up in development versions of React — this stuff isn't checked in production
+npm install prop-types
+  add the PropTypes node package to our node_modules folder so that we can access PropTypes:
+see propTypes reference https://facebook.github.io/react/docs/reusable-components.html#prop-validation
+
+example:
+import React from 'react';
+import PropTypes from 'prop-types';
+class Order extends React.Component{
+  render(){
+    return(
+      <div className="order">
+        <ul>
+          <li>{this.props.cone ? 'Cone' : ' Cup'}</li>
+          <li>{this.props.size}</li>
+          <li>{this.props.scoops.length} scoops:
+            {this.props.scoops.join(", ")}
+          </li>
+          <li>Ordered by {this.props.orderInfo.customerName} at
+            {this.props.orderInfo.orderedAt}
+          </li>
+        </ul>
+    </div>
+    )  }}
+Order.defaultProps = {  cone:true,  size: 'regular'}
+Order.propTypes = {
+  cone: PropTypes.bool,
+  size: PropTypes.string,
+  scoops: PropTypes.array(PropTypes.string).isRequired, // tell it we're expecting an array of strings:
+  //React.PropTypes.shape, we can tell our component to expect the prop to have a certain shape:
+  // orderInfo: PropTypes.object.isRequired
+  orderInfo: PropTypes.object.shape({
+    customerName: PropTypes.string.isRequired,
+    orderedAt: PropTypes.number.isRequired
+  }).isRequired
+}
